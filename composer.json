@@ -1,7 +1,7 @@
 {
     "name": "advicepharmagroup/mailup",
-    "description": "Driver per invio email tramite api Mailup",
-    "version": "1.0.0",
+    "description": "Driver for sending emails via Mailup api",
+    "version": "1.1.0",
     "keywords": [
         "advicepharma",
         "mailup"

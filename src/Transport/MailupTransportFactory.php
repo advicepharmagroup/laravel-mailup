@@ -22,7 +22,7 @@ class MailupTransportFactory extends AbstractTransportFactory
             $this->getUser($dsn),
             $this->getPassword($dsn),
             'default' === $dsn->getHost() ? 'localhost' : $dsn->getHost(),
-            new Client()
+            new Client(['http_errors' => false])
         );
 
     }

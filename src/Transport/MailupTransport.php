@@ -39,11 +39,13 @@ class MailupTransport extends AbstractTransport
             ]);
 
             if ($response->getStatusCode() !== 200) {
-                throw new \Exception('Failed to send email');
+                Log::error('Failed to send email');
+                Log::error("Status Code: {$response->getStatusCode()}");
+                Log::error("Body: {$response->getBody()}");
             }
 
         } catch (\Throwable $th) {
-            // log degli errori
+            // error log
             Log::error($th);
         }
 
