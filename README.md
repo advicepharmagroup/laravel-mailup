@@ -1,5 +1,8 @@
 # MailUp driver
 
+[![Latest Version on Packagist](https://img.shields.io/packagist/v/advicepharmagroup/mailup.svg?style=flat-square)](https://packagist.org/packages/advicepharmagroup/mailup)
+[![Total Downloads](https://img.shields.io/packagist/dt/advicepharmagroup/mailup.svg?style=flat-square)](https://packagist.org/packages/advicepharmagroup/mailup)
+
 A Laravel package for sending emails using the MailUp service API.
 
 ## Installation
