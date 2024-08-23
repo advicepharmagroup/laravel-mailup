@@ -19,6 +19,12 @@
     "require": {
         "php": "^8.1|^8.2"
     },
+    "require-dev": {
+        "guzzlehttp/guzzle": "^7.9",
+        "illuminate/log": "^10.48",
+        "symfony/mailer": "^6.4",
+        "symfony/mime": "^6.4"
+    },
     "autoload": {
         "psr-4": {
             "Advicepharmagroup\\Mailup\\": "src/"
@@ -34,6 +40,6 @@
     "config": {
         "sort-packages": true
     },
-    "minimum-stability": "dev",
+    "minimum-stability": "stable",
     "prefer-stable": true
 }

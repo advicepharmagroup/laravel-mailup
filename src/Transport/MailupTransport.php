@@ -2,11 +2,10 @@
 
 namespace Advicepharmagroup\Mailup\Transport;
 
+use GuzzleHttp\Client;
 use Illuminate\Support\Facades\Log;
-use Psr\Http\Client\ClientInterface;
 use Symfony\Component\Mailer\SentMessage;
 use Symfony\Component\Mailer\Transport\AbstractTransport;
-use Symfony\Component\Mime\Address;
 use Symfony\Component\Mime\Email;
 use Symfony\Component\Mime\MessageConverter;
 
@@ -17,7 +16,7 @@ class MailupTransport extends AbstractTransport
         private string $user,
         #[\SensitiveParameter] private string $secret,
         private string $host,
-        private ClientInterface $client
+        private Client $client
     ) {
         parent::__construct();
     }
@@ -56,36 +55,51 @@ class MailupTransport extends AbstractTransport
         return 'SMTP+ ' . \base64_encode("{$this->user}:{$this->secret}");
     }
 
-    private function formatAddresses(array $addresses, bool $first = false): array
+    private function getFrom(Email $email): array
     {
-        $result = array_map([$this, 'formatAddress'], $addresses);
-        if ($first) {
-            return \array_shift($result);
-        }
+        $address = $email->getFrom()[0];
+
+        return ['Email' => $address->getAddress(), 'Name' => $address->getName()];
+    }
+
+    private function getRecipients(Email $email): array
+    {
+        $result = array_map(
+            fn($address) => (['Email' => $address->getAddress(), 'Name' => $address->getName()]),
+            $email->getTo()
+        );
+
         return $result;
     }
 
-    private function formatAddress(Address $address): array
+    public function getAttachments(Email $email): array
     {
-        return [
-            'Email' => $address->getAddress(),
-            'Name'  => $address->getName(),
-        ];
+        $attachments = [];
+
+        foreach ($email->getAttachments() as $attachment) {
+            $attachments[] = [
+                'Filename' => $attachment->getFilename(),
+                'Body'     => base64_encode($attachment->getBody()),
+            ];
+        }
+
+        return $attachments;
     }
 
     private function getPayload(Email $email): array
     {
         return [
-            'User'    => [
+            'User'        => [
                 'Username' => $this->user,
                 'Secret'   => $this->secret,
             ],
-            'Subject' => $email->getSubject(),
-            'Html'    => [
+            'Subject'     => $email->getSubject(),
+            'Html'        => [
                 'Body' => $email->getHtmlBody() ?: $email->getTextBody(),
             ],
-            'From'    => $this->formatAddresses($email->getFrom(), true),
-            'To'      => $this->formatAddresses($email->getTo()),
+            'From'        => $this->getFrom($email),
+            'To'          => $this->getRecipients($email),
+            'Attachments' => $this->getAttachments($email),
         ];
     }
 
