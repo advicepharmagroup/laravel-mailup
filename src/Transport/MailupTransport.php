@@ -50,11 +50,22 @@ class MailupTransport extends AbstractTransport
 
     }
 
-    private function getAuthorization()
+    /**
+     * Return the authorization token
+     *
+     * @return string
+     */
+    private function getAuthorization(): string
     {
         return 'SMTP+ ' . \base64_encode("{$this->user}:{$this->secret}");
     }
 
+    /**
+     * Return From
+     *
+     * @param Email $email
+     * @return array
+     */
     private function getFrom(Email $email): array
     {
         $address = $email->getFrom()[0];
@@ -62,6 +73,12 @@ class MailupTransport extends AbstractTransport
         return ['Email' => $address->getAddress(), 'Name' => $address->getName()];
     }
 
+    /**
+     * Return recipients
+     *
+     * @param Email $email
+     * @return array
+     */
     private function getRecipients(Email $email): array
     {
         $result = array_map(
@@ -72,7 +89,13 @@ class MailupTransport extends AbstractTransport
         return $result;
     }
 
-    public function getAttachments(Email $email): array
+    /**
+     * Return attachments
+     *
+     * @param Email $email
+     * @return array
+     */
+    private function getAttachments(Email $email): array
     {
         $attachments = [];
 
@@ -86,6 +109,63 @@ class MailupTransport extends AbstractTransport
         return $attachments;
     }
 
+    /**
+     * Return attachment placeholder
+     *
+     * @param integer $n
+     * @param string $type
+     * @return string
+     */
+    private function makeTagAttachment(int $n, string $type): string
+    {
+        $tag = '';
+
+        if ($n == 0) {return '';}
+
+        if ($type == 'html') {
+            for ($i = 1; $i < $n + 1; $i++) {
+                $tag .= "<p>[attach{$i}]</p>";
+            }
+        }
+
+        if ($type == 'text') {
+            for ($i = 1; $i < $n + 1; $i++) {
+                $tag .= "\r\n[attach{$i}]";
+            }
+        }
+
+        return $tag;
+    }
+
+    /**
+     * Return body
+     *
+     * @param Email $email
+     * @return string
+     */
+    private function getBody(Email $email): string
+    {
+        $n_attachments = count($email->getAttachments());
+
+        $body = $email->getHtmlBody();
+        if ($body) {
+            return $body . $this->makeTagAttachment($n_attachments, 'html');
+        }
+
+        $body = $email->getTextBody();
+        if ($body) {
+            return $body . $this->makeTagAttachment($n_attachments, 'text');
+        }
+
+        return '';
+    }
+
+    /**
+     * Return payload
+     *
+     * @param Email $email
+     * @return array
+     */
     private function getPayload(Email $email): array
     {
         return [
@@ -95,7 +175,7 @@ class MailupTransport extends AbstractTransport
             ],
             'Subject'     => $email->getSubject(),
             'Html'        => [
-                'Body' => $email->getHtmlBody() ?: $email->getTextBody(),
+                'Body' => $this->getBody($email),
             ],
             'From'        => $this->getFrom($email),
             'To'          => $this->getRecipients($email),
