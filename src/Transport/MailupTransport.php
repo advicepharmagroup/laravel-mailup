@@ -149,7 +149,8 @@ class MailupTransport extends AbstractTransport
 
         $body = $email->getHtmlBody();
         if ($body) {
-            return $body . $this->makeTagAttachment($n_attachments, 'html');
+            $body .= $this->makeTagAttachment($n_attachments, 'html');
+            return str_replace(["\r\n", "\r", "\n"], '', $body);
         }
 
         $body = $email->getTextBody();
