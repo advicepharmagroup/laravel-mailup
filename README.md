@@ -21,9 +21,10 @@ composer require advicepharmagroup/mailup
 ...
 
 'mailup' => [
-    'host'   => env('MAILUP_HOST'),
-    'user'   => env('MAILUP_USER'),
-    'secret' => env('MAILUP_SECRET'),
+    'host'       => env('MAILUP_HOST'),
+    'user'       => env('MAILUP_USER'),
+    'secret'     => env('MAILUP_SECRET'),
+    'force_html' => true,
 ],
 
 ...
