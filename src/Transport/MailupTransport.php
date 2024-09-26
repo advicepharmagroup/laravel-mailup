@@ -12,6 +12,8 @@ use Symfony\Component\Mime\MessageConverter;
 class MailupTransport extends AbstractTransport
 {
 
+    private bool $force_html;
+
     public function __construct(
         private string $user,
         #[\SensitiveParameter] private string $secret,
@@ -19,6 +21,18 @@ class MailupTransport extends AbstractTransport
         private Client $client
     ) {
         parent::__construct();
+    }
+
+    /**
+     * Set the value of force_html
+     *
+     * @return  self
+     */
+    public function setForceHtml(bool $force_html)
+    {
+        $this->force_html = $force_html;
+
+        return $this;
     }
 
     /**
@@ -143,7 +157,7 @@ class MailupTransport extends AbstractTransport
      * @param Email $email
      * @return string
      */
-    private function getBody(Email $email): string
+    private function getBody(Email $email, bool $force_html = false): string
     {
         $n_attachments = count($email->getAttachments());
 
@@ -155,7 +169,11 @@ class MailupTransport extends AbstractTransport
 
         $body = $email->getTextBody();
         if ($body) {
-            return $body . $this->makeTagAttachment($n_attachments, 'text');
+            $body .= $this->makeTagAttachment($n_attachments, 'text');
+            if ($force_html) {
+                return str_replace(["\r\n", "\r", "\n"], '</br>', $body);
+            }
+            return $body;
         }
 
         return '';
@@ -176,7 +194,7 @@ class MailupTransport extends AbstractTransport
             ],
             'Subject'     => $email->getSubject(),
             'Html'        => [
-                'Body' => $this->getBody($email),
+                'Body' => $this->getBody($email, $this->force_html),
             ],
             'From'        => $this->getFrom($email),
             'To'          => $this->getRecipients($email),

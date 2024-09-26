@@ -7,11 +7,10 @@ use GuzzleHttp\Client;
 use Symfony\Component\Mailer\Exception\UnsupportedSchemeException;
 use Symfony\Component\Mailer\Transport\AbstractTransportFactory;
 use Symfony\Component\Mailer\Transport\Dsn;
-use Symfony\Component\Mailer\Transport\TransportInterface;
 
 class MailupTransportFactory extends AbstractTransportFactory
 {
-    public function create(Dsn $dsn): TransportInterface
+    public function create(Dsn $dsn): MailupTransport
     {
 
         if (!\in_array($dsn->getScheme(), $this->getSupportedSchemes(), true)) {
