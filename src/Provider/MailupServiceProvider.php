@@ -1,5 +1,4 @@
 <?php
-
 namespace Advicepharmagroup\Mailup\Provider;
 
 use Advicepharmagroup\Mailup\Transport\MailupTransportFactory;
@@ -26,7 +25,9 @@ class MailupServiceProvider extends ServiceProvider
                     $config['secret']
                 ));
 
-            $mailup_transport->setForceHtml($config['force_html']);
+            $mailup_transport
+                ->setForceHtml($config['force_html'])
+                ->setProxy($config['proxy']);
 
             return $mailup_transport;
         });

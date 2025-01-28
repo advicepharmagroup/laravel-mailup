@@ -1,5 +1,4 @@
 <?php
-
 namespace Advicepharmagroup\Mailup\Transport;
 
 use GuzzleHttp\Client;
@@ -13,6 +12,7 @@ class MailupTransport extends AbstractTransport
 {
 
     private bool $force_html;
+    private string $proxy;
 
     public function __construct(
         private string $user,
@@ -35,6 +35,13 @@ class MailupTransport extends AbstractTransport
         return $this;
     }
 
+    public function setProxy(string $proxy)
+    {
+        $this->proxy = $proxy;
+
+        return $this;
+    }
+
     /**
      * {@inheritDoc}
      */
@@ -49,6 +56,7 @@ class MailupTransport extends AbstractTransport
                     'Content-Type'  => 'application/json',
                 ],
                 'json'    => $this->getPayload($email),
+                'proxy'   => $this->proxy,
             ]);
 
             if ($response->getStatusCode() !== 200) {

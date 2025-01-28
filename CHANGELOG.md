@@ -2,6 +2,10 @@
 
 All notable changes to `mailup` will be documented in this file
 
+## 1.4.0 - 2025-01-28
+
+- added proxy setting
+
 ## 1.3.0 - 2024-09-26
 
 - added removal of \r \n characters in body in html format
